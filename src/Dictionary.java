@@ -2,15 +2,16 @@ import java.io.*;
 import java.nio.file.FileSystems;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
 
 public class Dictionary implements Entity, WordsSource {
+    private final BlockingQueue<Message> queue;
     private boolean isReady;
-    private final Dispatcher dispatcher;
     private final Map<Character, List<String>> words;
     private final SecureRandom random;
 
-    public Dictionary(Dispatcher dispatcher) {
-        this.dispatcher = dispatcher;
+    public Dictionary(BlockingQueue<Message> queue) {
+        this.queue = queue;
         this.words = new HashMap<>();
         this.random = new SecureRandom();
         isReady = false;
@@ -52,7 +53,7 @@ public class Dictionary implements Entity, WordsSource {
             if (isWordExist(payload)) {
                 result = payload;
             }
-            dispatcher.send(Event.Update, result, gameSide);
+            queue.add(new Message(Event.Update, result, gameSide));
         }
     }
 

@@ -1,7 +1,8 @@
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
 
 public class Dispatcher {
-
+    private final BlockingQueue<Message> queue;
     private final TriConsumer<StatePair, String, GameSide> controllerCB;
     private Stage currentStage;
     private List<StatePair> botStatePairs;
@@ -10,7 +11,8 @@ public class Dispatcher {
     private List<StatePair> gameStatePairs;
     private List<StatePair> gameStateStatePairs;
 
-    public Dispatcher(TriConsumer<StatePair, String, GameSide> controllerCB, Stage stageStart) {
+    public Dispatcher(BlockingQueue<Message> queue, TriConsumer<StatePair, String, GameSide> controllerCB, Stage stageStart) {
+        this.queue = queue;
         this.controllerCB = controllerCB;
         this.currentStage = stageStart;
         botStatePairs = new ArrayList<>();
@@ -37,7 +39,8 @@ public class Dispatcher {
         gameStateStatePairs.add(new StatePair(Event.Validate, Stage.Dictionary));
         gameStateStatePairs.add(new StatePair(Event.Notify, Stage.Game));
     }
-    void send(Event event, String payload, GameSide gameSide){
+
+    private void send(Event event, String payload, GameSide gameSide){
         switch (currentStage) {
             case Bot:
                 processEvent(botStatePairs, event, payload, gameSide);
@@ -58,6 +61,17 @@ public class Dispatcher {
                 System.out.println("Controller.doAction Error: illegal event: "
                         + event);
                 break;
+        }
+    }
+
+    void startProcessing() {
+        while (true) {
+            try {
+                Message nextMessage = queue.take();
+                send(nextMessage.getEvent(), nextMessage.getPayload(), nextMessage.getGameSide());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -1,10 +1,12 @@
+import java.util.concurrent.BlockingQueue;
+
 public class Bot implements Entity {
-    private final Dispatcher dispatcher;
+    private final BlockingQueue<Message> queue;
     private final WordsSource wordsSource;
     private String prevWord;
 
-    Bot(Dispatcher dispatcher, WordsSource wordsSource) {
-        this.dispatcher = dispatcher;
+    Bot(BlockingQueue<Message> queue, WordsSource wordsSource) {
+        this.queue = queue;
         this.wordsSource = wordsSource;
         prevWord = "";
     }
@@ -21,7 +23,7 @@ public class Bot implements Entity {
                 answer =
                         wordsSource.getRandomWord(payload.toLowerCase().charAt(payload.length() - 1));
             }
-            dispatcher.send(Event.Submit, answer, GameSide.Bot);
+            queue.add(new Message(Event.Submit, answer, GameSide.Bot));
         }
     }
 }

@@ -1,11 +1,12 @@
 import java.util.Scanner;
+import java.util.concurrent.BlockingQueue;
 
 public class User implements Entity {
-    private final Dispatcher dispatcher;
+    private final BlockingQueue<Message> queue;
     private final Scanner scanner;
 
-    public User(Dispatcher dispatcher) {
-        this.dispatcher = dispatcher;
+    public User(BlockingQueue<Message> queue) {
+        this.queue = queue;
         scanner = new Scanner(System.in);
     }
 
@@ -24,6 +25,8 @@ public class User implements Entity {
                 if (askToLoadPrevious()) {
                     sideOut = gameSide;
                     eventOut = Event.LoadState;
+                } else {
+                    input = askForInput();
                 }
             } else if (gameSide == GameSide.LoadDone) {
                 input = askForInput();
@@ -36,7 +39,7 @@ public class User implements Entity {
                     sideOut = GameSide.UserReject;
                 }
             }
-            dispatcher.send(eventOut, input, sideOut);
+            queue.add(new Message(eventOut, input, sideOut));
         }
     }
 

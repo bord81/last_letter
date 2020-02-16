@@ -1,25 +1,32 @@
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 public class Controller {
     private final Bot bot;
     private final Dictionary dictionary;
     private final Game game;
     private final GameState gameState;
     private final User user;
+    private final BlockingQueue<Message> queue;
+    private final Dispatcher dispatcher;
 
     Controller() {
-        Dispatcher dispatcher = new Dispatcher(this::doAction, Stage.User);
-        dictionary = new Dictionary(dispatcher);
+        queue = new LinkedBlockingQueue<>();
+        dispatcher = new Dispatcher(queue, this::doAction, Stage.User);
+        dictionary = new Dictionary(queue);
         if (!dictionary.isReady()) {
             System.out.println("Controller error: dictionary not ready.");
             System.exit(1);
         }
-        bot = new Bot(dispatcher, dictionary);
-        game = new Game(dispatcher);
-        gameState = new GameState(dispatcher, new GameStateSavedCSV());
-        user = new User(dispatcher);
+        bot = new Bot(queue, dictionary);
+        game = new Game(queue);
+        gameState = new GameState(queue, new GameStateSavedCSV());
+        user = new User(queue);
     }
 
     public void startGame() {
         user.process(Event.RefreshUI, "", GameSide.StartGame);
+        dispatcher.startProcessing();
     }
 
     void doAction(StatePair pair, String payload, GameSide gameSide) {

@@ -1,14 +1,15 @@
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
 
 public class GameState implements Entity {
-    private final Dispatcher dispatcher;
+    private final BlockingQueue<Message> queue;
     private final GameStateSaved gameStateSaved;
     private final Set<String> usedWords;
     private String prevWord;
 
-    public GameState(Dispatcher dispatcher, GameStateSaved gameStateSaved) {
-        this.dispatcher = dispatcher;
+    public GameState(BlockingQueue<Message> queue, GameStateSaved gameStateSaved) {
+        this.queue = queue;
         this.gameStateSaved = gameStateSaved;
         this.usedWords = new HashSet<>();
         prevWord = "";
@@ -48,7 +49,7 @@ public class GameState implements Entity {
             default:
                 break;
         }
-        dispatcher.send(eventOut, payload, sideOut);
+        queue.add(new Message(eventOut, payload, sideOut));
     }
 
     private void loadSavedGamestate() {
@@ -89,7 +90,7 @@ public class GameState implements Entity {
             default:
                 break;
         }
-        dispatcher.send(Event.Notify, payload, side);
+        queue.add(new Message(Event.Notify, payload, side));
     }
 
     private boolean wordAlreadyUsed(String word) {
