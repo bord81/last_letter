@@ -36,9 +36,12 @@ public class Dictionary implements Entity, WordsSource {
                     });
                 }
                 isReady = true;
+                reader.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            // log error
         }
     }
 

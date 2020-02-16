@@ -21,11 +21,17 @@ public class User implements Entity {
                 askOnReject(gameSide);
                 input = askForInput();
             } else if (gameSide == GameSide.StartGame) {
+                if (askToLoadPrevious()) {
+                    sideOut = gameSide;
+                    eventOut = Event.LoadState;
+                }
+            } else if (gameSide == GameSide.LoadDone) {
                 input = askForInput();
             } else {
                 if (askIfWordIsAccepted(payload)) {
                     input = askForInput();
                 } else {
+                    input = payload;
                     eventOut = Event.Reject;
                     sideOut = GameSide.UserReject;
                 }
@@ -42,6 +48,27 @@ public class User implements Entity {
     private boolean askIfWordIsAccepted(String word) {
         System.out.println("The word is: " + word);
         System.out.println("Do you accept?(y/N)");
+        return getAnswer();
+    }
+
+    private void askOnReject(GameSide side) {
+        if (side == GameSide.BotReject) {
+            System.out.println("Word rejected by bot. Try another one.");
+        } else if (side == GameSide.DictionaryUserReject) {
+            System.out.println("Word rejected by dictionary. Try another one.");
+        } else if (side == GameSide.WordByUserUsedReject) {
+            System.out.println("Word was already used. Try another one.");
+        } else if (side == GameSide.WordByUserUsedIncorrect) {
+            System.out.println("Word starts from the wrong letter. Try another one.");
+        }
+    }
+
+    private boolean askToLoadPrevious() {
+        System.out.println("Load previous game?(y/N)");
+        return getAnswer();
+    }
+
+    private boolean getAnswer() {
         boolean accept = false;
         while (true) {
             String choice = scanner.next();
@@ -53,17 +80,5 @@ public class User implements Entity {
             }
         }
         return accept;
-    }
-    private void askOnReject(GameSide side) {
-        if (side == GameSide.BotReject) {
-            System.out.println("Word rejected by bot. Try another one.");
-        } else if (side == GameSide.DictionaryUserReject) {
-            System.out.println("Word rejected by dictionary. Try another one.");
-        } else if (side == GameSide.WordByUserUsedReject) {
-            System.out.println("Word was already used. Try another one.");
-        }
-        else if (side == GameSide.WordByUserUsedIncorrect) {
-            System.out.println("Word starts from the wrong letter. Try another one.");
-        }
     }
 }

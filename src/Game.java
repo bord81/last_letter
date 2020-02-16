@@ -11,7 +11,7 @@ public class Game implements Entity {
             case Notify:
                 if (gameSide == GameSide.Bot || gameSide == GameSide.WordByUserUsedReject
                         || gameSide == GameSide.DictionaryUserReject || gameSide == GameSide.BotReject
-                        || gameSide == GameSide.WordByUserUsedIncorrect) {
+                        || gameSide == GameSide.WordByUserUsedIncorrect || gameSide == GameSide.LoadDone) {
                     dispatcher.send(Event.RefreshUI, payload, gameSide);
                 } else if (gameSide == GameSide.User || gameSide == GameSide.WordByBotUsedReject
                         || gameSide == GameSide.DictionaryBotReject || gameSide == GameSide.UserReject) {
@@ -24,6 +24,8 @@ public class Game implements Entity {
             case Submit:
                 dispatcher.send(Event.Validate, payload, gameSide);
                 break;
+            case LoadState:
+                dispatcher.send(event, payload, gameSide);
             default:
                 break;
         }

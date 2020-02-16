@@ -16,6 +16,7 @@ public class Dispatcher {
             case User:
                 statePairs.add(new StatePair(Event.Submit, Stage.Game));
                 statePairs.add(new StatePair(Event.Reject, Stage.Game));
+                statePairs.add(new StatePair(Event.LoadState, Stage.Game));
                 processEvent(statePairs, event, payload, gameSide);
                 break;
             case Dictionary:
@@ -27,6 +28,7 @@ public class Dispatcher {
                 statePairs.add(new StatePair(Event.Validate, Stage.GameState));
                 statePairs.add(new StatePair(Event.RefreshUI, Stage.User));
                 statePairs.add(new StatePair(Event.Ack, Stage.Bot));
+                statePairs.add(new StatePair(Event.LoadState, Stage.GameState));
                 processEvent(statePairs, event, payload, gameSide);
                 break;
             case GameState:

@@ -3,11 +3,13 @@ import java.util.Set;
 
 public class GameState implements Entity {
     private final Dispatcher dispatcher;
+    private final GameStateSaved gameStateSaved;
     private final Set<String> usedWords;
     private String prevWord;
 
-    public GameState(Dispatcher dispatcher) {
+    public GameState(Dispatcher dispatcher, GameStateSaved gameStateSaved) {
         this.dispatcher = dispatcher;
+        this.gameStateSaved = gameStateSaved;
         this.usedWords = new HashSet<>();
         prevWord = "";
     }
@@ -35,12 +37,30 @@ public class GameState implements Entity {
                 } else {
                     eventOut = Event.Validate;
                 }
+                if (sideOut == GameSide.StartGame) {
+                    sideOut = GameSide.User;
+                }
+                break;
+            case LoadState:
+                loadSavedGamestate();
+                sideOut = GameSide.LoadDone;
                 break;
             default:
                 break;
         }
         dispatcher.send(eventOut, payload, sideOut);
     }
+
+    private void loadSavedGamestate() {
+        prevWord = gameStateSaved.getPrevWord();
+        usedWords.addAll(gameStateSaved.getUsedWords());
+        System.out.println("Last word is: " + prevWord);
+    }
+
+    private void saveGamestate() {
+        gameStateSaved.saveState(prevWord, usedWords);
+    }
+
 
     private void processUpdateEvent(Event event, String payload, GameSide gameSide) {
         GameSide side = gameSide;
@@ -51,6 +71,7 @@ public class GameState implements Entity {
                 } else {
                     prevWord = payload;
                     usedWords.add(payload);
+                    saveGamestate();
                 }
                 break;
             case User:
@@ -59,10 +80,12 @@ public class GameState implements Entity {
                 } else {
                     prevWord = payload;
                     usedWords.add(payload);
+                    saveGamestate();
                 }
                 break;
             case UserReject:
             case BotReject:
+                usedWords.remove(payload);
             default:
                 break;
         }

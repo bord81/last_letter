@@ -14,7 +14,7 @@ public class Controller {
         }
         bot = new Bot(dispatcher, dictionary);
         game = new Game(dispatcher);
-        gameState = new GameState(dispatcher);
+        gameState = new GameState(dispatcher, new GameStateSavedCSV());
         user = new User(dispatcher);
     }
 
