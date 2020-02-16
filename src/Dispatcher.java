@@ -4,37 +4,55 @@ public class Dispatcher {
 
     private final TriConsumer<StatePair, String, GameSide> controllerCB;
     private Stage currentStage;
+    private List<StatePair> botStatePairs;
+    private List<StatePair> userStatePairs;
+    private List<StatePair> dictStatePairs;
+    private List<StatePair> gameStatePairs;
+    private List<StatePair> gameStateStatePairs;
 
     public Dispatcher(TriConsumer<StatePair, String, GameSide> controllerCB, Stage stageStart) {
         this.controllerCB = controllerCB;
         this.currentStage = stageStart;
+        botStatePairs = new ArrayList<>();
+        userStatePairs = new ArrayList<>();
+        dictStatePairs =  new ArrayList<>();
+        gameStatePairs = new ArrayList<>();
+        gameStateStatePairs = new ArrayList<>();
+
+        botStatePairs.add(new StatePair(Event.Submit, Stage.Game));
+        botStatePairs.add(new StatePair(Event.Reject, Stage.Game));
+
+        userStatePairs.add(new StatePair(Event.Submit, Stage.Game));
+        userStatePairs.add(new StatePair(Event.Reject, Stage.Game));
+        userStatePairs.add(new StatePair(Event.LoadState, Stage.Game));
+
+        dictStatePairs.add(new StatePair(Event.Update, Stage.GameState));
+
+        gameStatePairs.add(new StatePair(Event.Update, Stage.GameState));
+        gameStatePairs.add(new StatePair(Event.Validate, Stage.GameState));
+        gameStatePairs.add(new StatePair(Event.RefreshUI, Stage.User));
+        gameStatePairs.add(new StatePair(Event.Ack, Stage.Bot));
+        gameStatePairs.add(new StatePair(Event.LoadState, Stage.GameState));
+
+        gameStateStatePairs.add(new StatePair(Event.Validate, Stage.Dictionary));
+        gameStateStatePairs.add(new StatePair(Event.Notify, Stage.Game));
     }
     void send(Event event, String payload, GameSide gameSide){
-        List<StatePair> statePairs = new ArrayList<>();
         switch (currentStage) {
             case Bot:
+                processEvent(botStatePairs, event, payload, gameSide);
+                break;
             case User:
-                statePairs.add(new StatePair(Event.Submit, Stage.Game));
-                statePairs.add(new StatePair(Event.Reject, Stage.Game));
-                statePairs.add(new StatePair(Event.LoadState, Stage.Game));
-                processEvent(statePairs, event, payload, gameSide);
+                processEvent(userStatePairs, event, payload, gameSide);
                 break;
             case Dictionary:
-                statePairs.add(new StatePair(Event.Update, Stage.GameState));
-                processEvent(statePairs, event, payload, gameSide);
+                processEvent(dictStatePairs, event, payload, gameSide);
                 break;
             case Game:
-                statePairs.add(new StatePair(Event.Update, Stage.GameState));
-                statePairs.add(new StatePair(Event.Validate, Stage.GameState));
-                statePairs.add(new StatePair(Event.RefreshUI, Stage.User));
-                statePairs.add(new StatePair(Event.Ack, Stage.Bot));
-                statePairs.add(new StatePair(Event.LoadState, Stage.GameState));
-                processEvent(statePairs, event, payload, gameSide);
+                processEvent(gameStatePairs, event, payload, gameSide);
                 break;
             case GameState:
-                statePairs.add(new StatePair(Event.Validate, Stage.Dictionary));
-                statePairs.add(new StatePair(Event.Notify, Stage.Game));
-                processEvent(statePairs, event, payload, gameSide);
+                processEvent(gameStateStatePairs, event, payload, gameSide);
                 break;
             default:
                 System.out.println("Controller.doAction Error: illegal event: "
