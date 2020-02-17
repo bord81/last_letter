@@ -5,7 +5,7 @@ import java.util.concurrent.BlockingQueue;
 
 public class Dispatcher {
     private final BlockingQueue<Message> queue;
-    private final TriConsumer<StatePair, String, GameSide> controllerCB;
+    private final TriConsumer<StatePair, String, SubEvent> controllerCB;
     private Stage currentStage;
     private List<StatePair> botStatePairs;
     private List<StatePair> userStatePairs;
@@ -13,7 +13,7 @@ public class Dispatcher {
     private List<StatePair> gameStatePairs;
     private List<StatePair> gameStateStatePairs;
 
-    public Dispatcher(BlockingQueue<Message> queue, TriConsumer<StatePair, String, GameSide> controllerCB, Stage stageStart) {
+    public Dispatcher(BlockingQueue<Message> queue, TriConsumer<StatePair, String, SubEvent> controllerCB, Stage stageStart) {
         this.queue = queue;
         this.controllerCB = controllerCB;
         this.currentStage = stageStart;
@@ -42,22 +42,22 @@ public class Dispatcher {
         gameStateStatePairs.add(new StatePair(Event.Notify, Stage.Game));
     }
 
-    private void send(Event event, String payload, GameSide gameSide){
+    private void send(Event event, String payload, SubEvent subEvent){
         switch (currentStage) {
             case Bot:
-                processEvent(botStatePairs, event, payload, gameSide);
+                processEvent(botStatePairs, event, payload, subEvent);
                 break;
             case User:
-                processEvent(userStatePairs, event, payload, gameSide);
+                processEvent(userStatePairs, event, payload, subEvent);
                 break;
             case Dictionary:
-                processEvent(dictStatePairs, event, payload, gameSide);
+                processEvent(dictStatePairs, event, payload, subEvent);
                 break;
             case Game:
-                processEvent(gameStatePairs, event, payload, gameSide);
+                processEvent(gameStatePairs, event, payload, subEvent);
                 break;
             case GameState:
-                processEvent(gameStateStatePairs, event, payload, gameSide);
+                processEvent(gameStateStatePairs, event, payload, subEvent);
                 break;
             default:
                 System.out.println("Controller.doAction Error: illegal event: "
@@ -70,14 +70,14 @@ public class Dispatcher {
         while (true) {
             try {
                 Message nextMessage = queue.take();
-                send(nextMessage.getEvent(), nextMessage.getPayload(), nextMessage.getGameSide());
+                send(nextMessage.getEvent(), nextMessage.getPayload(), nextMessage.getSubEvent());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void processEvent(List<StatePair> statePairs, Event currentEvent, String payload, GameSide gameSide) {
+    private void processEvent(List<StatePair> statePairs, Event currentEvent, String payload, SubEvent subEvent) {
         StatePair statePairFound = null;
         for (StatePair statePair : statePairs) {
             if (statePair.getEvent() == currentEvent) {
@@ -87,7 +87,7 @@ public class Dispatcher {
         }
         if (statePairFound != null) {
             currentStage = statePairFound.getStage();
-            controllerCB.accept(statePairFound, payload, gameSide);
+            controllerCB.accept(statePairFound, payload, subEvent);
         } else {
             System.out.println("Dispatcher.processEvent Error: illegal event "
             + currentEvent.toString() + " in stage " + currentStage.toString());

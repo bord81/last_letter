@@ -13,24 +13,24 @@ public class User implements Entity {
     }
 
     @Override
-    public void process(Event event, String payload, GameSide gameSide) {
+    public void process(Event event, String payload, SubEvent subEvent) {
         if (event == Event.RefreshUI) {
             String input = "";
             Event eventOut = Event.Submit;
-            GameSide sideOut = GameSide.User;
-            if (gameSide == GameSide.DictionaryUserReject || gameSide == GameSide.BotReject
-                    || gameSide == GameSide.WordByUserUsedReject
-                    || gameSide == GameSide.WordByUserUsedIncorrect) {
-                askOnReject(gameSide);
+            SubEvent sideOut = SubEvent.FromUser;
+            if (subEvent == SubEvent.DictionaryUserReject || subEvent == SubEvent.BotReject
+                    || subEvent == SubEvent.WordByUserUsedReject
+                    || subEvent == SubEvent.WordByUserUsedIncorrect) {
+                askOnReject(subEvent);
                 input = askForInput();
-            } else if (gameSide == GameSide.StartGame) {
+            } else if (subEvent == SubEvent.StartGame) {
                 if (askToLoadPrevious()) {
-                    sideOut = gameSide;
+                    sideOut = subEvent;
                     eventOut = Event.LoadState;
                 } else {
                     input = askForInput();
                 }
-            } else if (gameSide == GameSide.LoadDone) {
+            } else if (subEvent == SubEvent.LoadDone) {
                 input = askForInput();
             } else {
                 if (askIfWordIsAccepted(payload)) {
@@ -38,7 +38,7 @@ public class User implements Entity {
                 } else {
                     input = payload;
                     eventOut = Event.Reject;
-                    sideOut = GameSide.UserReject;
+                    sideOut = SubEvent.UserReject;
                 }
             }
             queue.add(new Message(eventOut, input, sideOut));
@@ -56,14 +56,14 @@ public class User implements Entity {
         return getAnswer();
     }
 
-    private void askOnReject(GameSide side) {
-        if (side == GameSide.BotReject) {
+    private void askOnReject(SubEvent side) {
+        if (side == SubEvent.BotReject) {
             System.out.println("Word rejected by bot. Try another one.");
-        } else if (side == GameSide.DictionaryUserReject) {
+        } else if (side == SubEvent.DictionaryUserReject) {
             System.out.println("Word rejected by dictionary. Try another one.");
-        } else if (side == GameSide.WordByUserUsedReject) {
+        } else if (side == SubEvent.WordByUserUsedReject) {
             System.out.println("Word was already used. Try another one.");
-        } else if (side == GameSide.WordByUserUsedIncorrect) {
+        } else if (side == SubEvent.WordByUserUsedIncorrect) {
             System.out.println("Word starts from the wrong letter. Try another one.");
         }
     }

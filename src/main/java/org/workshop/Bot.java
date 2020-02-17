@@ -14,10 +14,10 @@ public class Bot implements Entity {
     }
 
     @Override
-    public void process(Event event, String payload, GameSide gameSide) {
+    public void process(Event event, String payload, SubEvent subEvent) {
         if (event == Event.Ack) {
             String answer;
-            if (gameSide == GameSide.UserReject) {
+            if (subEvent == SubEvent.UserReject) {
                 answer =
                         wordsSource.getRandomWord(prevWord.toLowerCase().charAt(prevWord.length() - 1));
             } else {
@@ -25,7 +25,7 @@ public class Bot implements Entity {
                 answer =
                         wordsSource.getRandomWord(payload.toLowerCase().charAt(payload.length() - 1));
             }
-            queue.add(new Message(Event.Submit, answer, GameSide.Bot));
+            queue.add(new Message(Event.Submit, answer, SubEvent.FromBot));
         }
     }
 }

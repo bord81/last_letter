@@ -1,6 +1,6 @@
 package org.workshop;
 
-public enum GameSide {
-    Bot, User, BotReject, UserReject, DictionaryBotReject, DictionaryUserReject,
+public enum SubEvent {
+    FromBot, FromUser, BotReject, UserReject, DictionaryBotReject, DictionaryUserReject,
     WordByBotUsedReject, WordByUserUsedReject, WordByUserUsedIncorrect, StartGame, LoadDone
 }

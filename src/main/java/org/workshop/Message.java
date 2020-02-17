@@ -3,7 +3,7 @@ package org.workshop;
 public class Message {
     private final Event event;
     private final String payload;
-    private final GameSide gameSide;
+    private final SubEvent subEvent;
 
     public Event getEvent() {
         return event;
@@ -13,13 +13,13 @@ public class Message {
         return payload;
     }
 
-    public GameSide getGameSide() {
-        return gameSide;
+    public SubEvent getSubEvent() {
+        return subEvent;
     }
 
-    public Message(Event event, String payload, GameSide gameSide) {
+    public Message(Event event, String payload, SubEvent subEvent) {
         this.event = event;
         this.payload = payload;
-        this.gameSide = gameSide;
+        this.subEvent = subEvent;
     }
 }

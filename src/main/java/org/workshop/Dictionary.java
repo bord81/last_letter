@@ -49,13 +49,13 @@ public class Dictionary implements Entity, WordsSource {
     }
 
     @Override
-    public void process(Event event, String payload, GameSide gameSide) {
+    public void process(Event event, String payload, SubEvent subEvent) {
         if (event == Event.Validate) {
             String result = "";
             if (isWordExist(payload)) {
                 result = payload;
             }
-            queue.add(new Message(Event.Update, result, gameSide));
+            queue.add(new Message(Event.Update, result, subEvent));
         }
     }
 

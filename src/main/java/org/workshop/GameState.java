@@ -18,35 +18,35 @@ public class GameState implements Entity {
     }
 
     @Override
-    public void process(Event event, String payload, GameSide gameSide) {
-        GameSide sideOut = gameSide;
+    public void process(Event event, String payload, SubEvent subEvent) {
+        SubEvent sideOut = subEvent;
         Event eventOut = Event.Notify;
         switch (event) {
             case Update:
-                processUpdateEvent(event, payload, gameSide);
+                processUpdateEvent(event, payload, subEvent);
                 return;
             case Validate:
                 if (wordAlreadyUsed(payload)) {
-                    if (gameSide == GameSide.Bot) {
-                        sideOut = GameSide.WordByBotUsedReject;
-                    } else if (gameSide == GameSide.User) {
-                        sideOut = GameSide.WordByUserUsedReject;
+                    if (subEvent == SubEvent.FromBot) {
+                        sideOut = SubEvent.WordByBotUsedReject;
+                    } else if (subEvent == SubEvent.FromUser) {
+                        sideOut = SubEvent.WordByUserUsedReject;
                     } else {
-                        System.out.println("GameState.process error: wordAlreadyUsed by incorrect side: " + gameSide);
+                        System.out.println("GameState.process error: wordAlreadyUsed by incorrect side: " + subEvent);
                         System.exit(1);
                     }
-                } else if (gameSide == GameSide.User && wordStartsFromWrongChar(payload)) {
-                    sideOut = GameSide.WordByUserUsedIncorrect;
+                } else if (subEvent == SubEvent.FromUser && wordStartsFromWrongChar(payload)) {
+                    sideOut = SubEvent.WordByUserUsedIncorrect;
                 } else {
                     eventOut = Event.Validate;
                 }
-                if (sideOut == GameSide.StartGame) {
-                    sideOut = GameSide.User;
+                if (sideOut == SubEvent.StartGame) {
+                    sideOut = SubEvent.FromUser;
                 }
                 break;
             case LoadState:
                 loadSavedGamestate();
-                sideOut = GameSide.LoadDone;
+                sideOut = SubEvent.LoadDone;
                 break;
             default:
                 break;
@@ -65,21 +65,21 @@ public class GameState implements Entity {
     }
 
 
-    private void processUpdateEvent(Event event, String payload, GameSide gameSide) {
-        GameSide side = gameSide;
-        switch (gameSide) {
-            case Bot:
+    private void processUpdateEvent(Event event, String payload, SubEvent subEvent) {
+        SubEvent side = subEvent;
+        switch (subEvent) {
+            case FromBot:
                 if (payload.length() == 0) {
-                    side = GameSide.DictionaryBotReject;
+                    side = SubEvent.DictionaryBotReject;
                 } else {
                     prevWord = payload;
                     usedWords.add(payload);
                     saveGamestate();
                 }
                 break;
-            case User:
+            case FromUser:
                 if (payload.length() == 0) {
-                    side = GameSide.DictionaryUserReject;
+                    side = SubEvent.DictionaryUserReject;
                 } else {
                     prevWord = payload;
                     usedWords.add(payload);

@@ -27,26 +27,26 @@ public class Controller {
     }
 
     public void startGame() {
-        user.process(Event.RefreshUI, "", GameSide.StartGame);
+        user.process(Event.RefreshUI, "", SubEvent.StartGame);
         dispatcher.startProcessing();
     }
 
-    void doAction(StatePair pair, String payload, GameSide gameSide) {
+    void doAction(StatePair pair, String payload, SubEvent subEvent) {
         switch (pair.getStage()) {
             case Bot:
-                bot.process(pair.getEvent(), payload, gameSide);
+                bot.process(pair.getEvent(), payload, subEvent);
                 break;
             case Dictionary:
-                dictionary.process(pair.getEvent(), payload, gameSide);
+                dictionary.process(pair.getEvent(), payload, subEvent);
                 break;
             case Game:
-                game.process(pair.getEvent(), payload, gameSide);
+                game.process(pair.getEvent(), payload, subEvent);
                 break;
             case GameState:
-                gameState.process(pair.getEvent(), payload, gameSide);
+                gameState.process(pair.getEvent(), payload, subEvent);
                 break;
             case User:
-                user.process(pair.getEvent(), payload, gameSide);
+                user.process(pair.getEvent(), payload, subEvent);
                 break;
             default:
                 System.out.println("Controller.doAction Error: illegal stage: "

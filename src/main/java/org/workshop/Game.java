@@ -10,26 +10,26 @@ public class Game implements Entity {
     }
 
     @Override
-    public void process(Event event, String payload, GameSide gameSide) {
+    public void process(Event event, String payload, SubEvent subEvent) {
         switch (event) {
             case Notify:
-                if (gameSide == GameSide.Bot || gameSide == GameSide.WordByUserUsedReject
-                        || gameSide == GameSide.DictionaryUserReject || gameSide == GameSide.BotReject
-                        || gameSide == GameSide.WordByUserUsedIncorrect || gameSide == GameSide.LoadDone) {
-                    queue.add(new Message(Event.RefreshUI, payload, gameSide));
-                } else if (gameSide == GameSide.User || gameSide == GameSide.WordByBotUsedReject
-                        || gameSide == GameSide.DictionaryBotReject || gameSide == GameSide.UserReject) {
-                    queue.add(new Message(Event.Ack, payload, gameSide));
+                if (subEvent == SubEvent.FromBot || subEvent == SubEvent.WordByUserUsedReject
+                        || subEvent == SubEvent.DictionaryUserReject || subEvent == SubEvent.BotReject
+                        || subEvent == SubEvent.WordByUserUsedIncorrect || subEvent == SubEvent.LoadDone) {
+                    queue.add(new Message(Event.RefreshUI, payload, subEvent));
+                } else if (subEvent == SubEvent.FromUser || subEvent == SubEvent.WordByBotUsedReject
+                        || subEvent == SubEvent.DictionaryBotReject || subEvent == SubEvent.UserReject) {
+                    queue.add(new Message(Event.Ack, payload, subEvent));
                 }
                 break;
             case Reject:
-                queue.add(new Message(Event.Update, payload, gameSide));
+                queue.add(new Message(Event.Update, payload, subEvent));
                 break;
             case Submit:
-                queue.add(new Message(Event.Validate, payload, gameSide));
+                queue.add(new Message(Event.Validate, payload, subEvent));
                 break;
             case LoadState:
-                queue.add(new Message(event, payload, gameSide));
+                queue.add(new Message(event, payload, subEvent));
             default:
                 break;
         }
