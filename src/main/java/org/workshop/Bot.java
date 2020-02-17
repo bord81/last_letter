@@ -1,3 +1,5 @@
+package org.workshop;
+
 import java.util.concurrent.BlockingQueue;
 
 public class Bot implements Entity {

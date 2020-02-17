@@ -1,3 +1,5 @@
+package org.workshop;
+
 public class LastLetter {
 
     public static void main(String[] args) {

@@ -1,3 +1,5 @@
+package org.workshop;
+
 import java.util.Set;
 
 public interface GameStateSaved {

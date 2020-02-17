@@ -1,3 +1,5 @@
+package org.workshop;
+
 class StatePair {
     private final Event event;
     private final Stage stage;

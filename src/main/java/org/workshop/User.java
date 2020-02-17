@@ -1,3 +1,5 @@
+package org.workshop;
+
 import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
 

@@ -1,3 +1,5 @@
+package org.workshop;
+
 public class Message {
     private final Event event;
     private final String payload;

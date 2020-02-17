@@ -1,0 +1,1 @@
+java -cp target/last_letter-1.0-SNAPSHOT.jar org.workshop.LastLetter

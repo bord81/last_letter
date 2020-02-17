@@ -1,3 +1,5 @@
+package org.workshop;
+
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.util.*;
